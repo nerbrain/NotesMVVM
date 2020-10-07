@@ -2,6 +2,7 @@ package com.example.architectureexample;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -9,7 +10,6 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import java.util.Timer;
 
 @Database(entities = Note.class, version = 1)
 public abstract class NoteDatabase extends RoomDatabase {
@@ -46,8 +46,9 @@ public abstract class NoteDatabase extends RoomDatabase {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            for(int i=0; i<=3 ; i++){
+            for(int i=1; i<=3 ; i++){
                 noteDao.insert(new Note("Title "+i,"Description "+i,i));
+                Log.d("TAG", "doInBackground: " + new Note("Title "+i,"Description "+i,i));
             }
             return null;
         }
