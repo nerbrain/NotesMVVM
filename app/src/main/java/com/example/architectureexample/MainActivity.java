@@ -3,7 +3,6 @@ package com.example.architectureexample;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,18 +10,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final int EDIT_NOTE_REQUEST = 1;
 
     private NoteViewModel noteViewModel;
     RecyclerView recyclerView;
@@ -53,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,AddNoteActivity.class));
+                startActivity(new Intent(MainActivity.this, AddEditNoteActivity.class));
             }
         });
 
@@ -70,6 +69,18 @@ public class MainActivity extends AppCompatActivity {
                 noteViewModel.delete(noteAdapter.getNoteAt(viewHolder.getAdapterPosition()));
             }
         }).attachToRecyclerView(recyclerView);
+
+        noteAdapter.setOnItemClickListener(new NoteAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(Note note) {
+                Intent intent = new Intent(MainActivity.this, AddEditNoteActivity.class);
+                intent.putExtra(AddEditNoteActivity.EXTRA_ID,note.getId());
+                intent.putExtra(AddEditNoteActivity.EXTRA_TITLE, note.getTitle());
+                intent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
+                intent.putExtra(AddEditNoteActivity.EXTRA_PRIORITY, note.getPriority());
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

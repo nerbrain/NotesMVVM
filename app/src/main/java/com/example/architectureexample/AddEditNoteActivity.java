@@ -1,10 +1,13 @@
 package com.example.architectureexample;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +16,12 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
-public class AddNoteActivity extends AppCompatActivity {
+public class AddEditNoteActivity extends AppCompatActivity {
+
+    public static final String EXTRA_ID = "com.example.architectureexample.EXTRA_ID";
+    public static final String EXTRA_TITLE = "com.example.architectureexample.EXTRA_TITLE";
+    public static final String EXTRA_DESCRIPTION = "com.example.architectureexample.EXTRA_DESCRIPTION";
+    public static final String EXTRA_PRIORITY = "com.example.architectureexample.EXTRA_PRIORITY";
 
     private NoteViewModel noteViewModel;
 
@@ -36,7 +44,17 @@ public class AddNoteActivity extends AppCompatActivity {
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
-        setTitle("Add Note");
+
+        Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_ID)){
+            setTitle("Edit Note");
+            editText_title.setText(intent.getStringExtra(EXTRA_TITLE));
+            editText_description.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
+            numberPicker_priority.setValue(intent.getIntExtra(EXTRA_PRIORITY,1));
+        }else{
+            setTitle("Add Note");
+        }
+
     }
 
     private void saveNote() {
@@ -45,9 +63,17 @@ public class AddNoteActivity extends AppCompatActivity {
         int priority = numberPicker_priority.getValue();
         Note note = new Note(title,description,priority);
 
+        Intent intent = getIntent();
+        int id = intent.getIntExtra(EXTRA_ID,-1);
+
         if (title.trim().isEmpty() || description.trim().isEmpty()) {
             Toast.makeText(this, "Insert Title And Description", Toast.LENGTH_SHORT).show();
-        } else {
+        }else if (intent.hasExtra(EXTRA_ID)){
+            note.setId(id);
+            noteViewModel.update(note);
+            Toast.makeText(this, "Note updated", Toast.LENGTH_SHORT).show();
+            finish();
+        }else {
             noteViewModel.insert(note);
             finish();
         }
